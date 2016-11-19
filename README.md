@@ -81,3 +81,5 @@ Consider the following feature functions for this machine problem:
 In this machine problem, we will use a **functional interface** to pass and return functions but we could have also considered using [lambdas that Java 8 supports](https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html).
 
 > To pass and return functions in this machine problem, you can have classes that implement the interface `LeastSquaresRegression` which contains a single method to be implemented `lsrf`. Different implementations of the interface will allow for different functions `lsrf`.
+
+**More to be added**
