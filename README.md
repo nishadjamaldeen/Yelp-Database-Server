@@ -159,6 +159,7 @@ Functionality apart, we will evaluate your submissions carefully along the follo
 + code style;
 + clear specifications for methods;
 + implementation of unit tests;
++ code-level comments as appropriate;
 + comments the indicate clearly what the representation invariants and abstraction functions are for the datatypes you create.
 
 You may lose up to 40% of your score for not following some of the above non-functional requirements.
