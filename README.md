@@ -121,7 +121,7 @@ In our request-response model, the request would begin with the keyword `QUERY` 
 
 A query string may be: `in(Telegraph Ave) && (category(Chinese) || category(Italian)) && price(1..2)`. This query string represents a query to obtain a list of Chinese and Italian restaurants in the Telegraph Avenue neighbourhood that have a price range of 1-2.
 
-For the query string above, the server would respond with a list of restaurants in JSON notation. If no restaurants match the query (for any reason) then the server should respond with `ERR: NO_MATCH`.
+For the query string above, the server would respond with a list of restaurants in JSON notation. If no restaurants match the query (for any reason) then the server should respond with `ERR: NO_MATCH`. If no query string is sent or if the query is ill-formed then the response should be `ERR: INVALID_QUERY`.
 
 The grammar for the query language looks something like this:
 
