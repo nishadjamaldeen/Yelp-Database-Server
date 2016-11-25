@@ -9,7 +9,7 @@ public class Algorithms {
 	/**
 	 * Use k-means clustering to compute k clusters for the restaurants in the
 	 * database.
-	 * 
+	 *
 	 * @param db
 	 * @return
 	 */
@@ -23,12 +23,13 @@ public class Algorithms {
 		return null;
 	}
 
-	public static MP5Function getPredictor(User u, RestaurantDB db, MP5Function featureFunction) {
+	// here we are abusing notation a bit when passing a function to getPredictor. This is a way to pass a function that obtains, say, latitude or longitude of a restaurant. You can improve on this is you like. It is the implementation of getBestPredictor that matters.
+	public static LeastSquaresRegression getPredictor(User u, RestaurantDB db, LeastSquaresRegression featureFunction) {
 		// TODO: Implement this method
 		return null;
 	}
 
-	public static MP5Function getBestPredictor(User u, RestaurantDB db, List<MP5Function> featureFunctionList) {
+	public static LeastSquaresRegression getBestPredictor(User u, RestaurantDB db, List<LeastSquaresRegression> featureFunctionList) {
 		// TODO: Implement this method
 		return null;
 	}

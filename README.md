@@ -82,4 +82,90 @@ In this machine problem, we will use a **functional interface** to pass and retu
 
 > To pass and return functions in this machine problem, you can have classes that implement the interface `LeastSquaresRegression` which contains a single method to be implemented `lsrf`. Different implementations of the interface will allow for different functions `lsrf`.
 
-**More to be added**
+### Part III: A RestaurantDB Server
+
+In the next part of this machine problem, you should implement a multi-threaded server application, `RestaurantDBServer` that wraps a RestaurantDB instance.
+
+One should be able to start the server from the command line using
+
+```
+java ca.ece.ubc.cpen221.mp5.RestaurantDBServer 4949
+```
+
+where `4949` is the port number at which the server should listen for connection requests. The server should use the command line argument to decide which port number to bind to.
+
+The server should be able to handle more than one connection at the same time (and hence the need for multithreading).
+
+### Part IV: Handling Simple Requests
+
+The server should be able to handle some simple requests from a client that connects to it.
+
+Here are five simple requests that you should implement:
+
++ `RANDOMREVIEW <restaurant name>`: If a client sends a string that begins with `RANDOMREVIEW` then the next word in that string should be interpreted as a restaurant name and the server should return (in JSON format, using the Yelp standard) a random review for that restaurant. If there is to such restaurant, the server should return the string `ERR: NO_RESTAURANT_FOUND`. If the restaurant name matches more than one restaurant then the server should return `ERR: MULTIPLE_RESTAURANTS`. (Note that the restaurant name is not wrapped in `< >`. The use of `< >` is to indicate that the command should be followed by a required argument.)
++ `GETRESTAURANT <business id>`: To this request, the server should respond with the restaurant details in JSON format for the restaurant that has the provided business identifier. If there is no such restaurant then one should use the error message as above.
++ `ADDUSER <user information>`: This request is a string that begins with the keyword (in our protocol), `ADDUSER`, followed by user details in JSON, formatted as suited for the Yelp dataset. Since we are adding a new user the JSON formatted information will contain only the user's name. So the JSON string may look like this `{"name": "Sathish G."}`. The server should interact with the RestaurantDB to create a new user, generate a new userid (it does not have to be in the Yelp userid format, you can use your own format for new users), generate a new URL (although it is a dummy URL) and then acknowledge that the user was created by responding with a more complete JSON string such as:
+  `{"url": "http://www.yelp.com/user_details?userid=42", "votes": {}, "review_count": 0, "type": "user", "user_id": "42", "name": "Sathish G.", "average_stars": 0}`. If the argument to the `ADDUSER` command is invalid (not JSON format, missing name, etc.) then the server would respond with the message `ERR: INVALID_USER_STRING`. Note that the server can create a new user if the argument to this command is a valid JSON string and has a field called `name` but also has other information (which can be ignored).
+  + `ADDRESTAURANT <restaurant information>`: This command has structure similar to the `ADDUSER` command in that the JSON string representing a restaurant should have all the necessary details to create a new restaurant except for details such as `business_id` and `stars`. The valid error messages (as needed) are `ERR: INVALID_RESTAURANT_STRING` and `ERR: DUPLICATE_RESTAURANT` (if a new restaurant is added at the same location as another restaurant).
+  + `ADDREVIEW <review information>`: The last simple command to implement is an `ADDREVIEW` command which has the same principle as the other commands. The possible error codes are `ERR: INVALID_REVIEW_STRING`, `ERR: NO_SUCH_USER` and `ERR: NO_SUCH_RESTAURANT`.
+
+Remember that when multiple clients are making such requests to change the database you will need to deal with potential data races and other concurrency-related conflicts.
+
+### Part V: Structured Queries
+
+The final part of this machine problem is to support structured queries over the database you have constructed. The request-response pattern will be handled by the `RestaurantDBServer` as was the case with "simple" requests earlier.
+
+We would like to process queries such as "list all restaurants in a neighbourhood that serve Chinese food and have moderate ($$) price."
+
+In our request-response model, the request would begin with the keyword `QUERY` followed by a string that represents the query.
+
+A query string may be: `in(Telegraph Ave) && (category(Chinese) || category(Italian)) && price(1..2)`. This query string represents a query to obtain a list of Chinese and Italian restaurants in the Telegraph Avenue neighbourhood that have a price range of 1-2.
+
+For the query string above, the server would respond with a list of restaurants in JSON notation. If no restaurants match the query (for any reason) then the server should respond with `ERR: NO_MATCH`.
+
+The grammar for the query language looks something like this:
+
+```
+<orExpr> ::= <andExpr>(<or><andExpr>)*
+<andExpr> ::= <atom>(<and><atom>)*
+<atom> ::= <in>|<category>|<rating>|<price>|<name>|<LParen><orExpr><RParen>
+<or> ::= "||"
+<and> ::= "&&"
+<in> ::= "in" <LParen><string><RParen>
+<category> ::= "category" <LParen><string><RParen>
+<name> ::= "name" <LParen><string><RParen>
+<rating> ::= "rating" <LParen><range><RParen>
+<price> ::= "price" <LParen><range>|<singlePrice><RParen>
+<range> ::= [1-5]..[1-5]
+<singlePrice> ::= [1-5]
+<LParen> ::= "("
+<RParen> ::= ")"
+```
+
+### Grading Guidelines
+
+We will grade your work using the following _approximate_ breakdown of the aspects of required.
+
+We will use the following approximate rubric to grade your work:		
+
+ | Task | Grade Contribution |		
+ |:----|---:|		
+ | k-means Clustering | 20% |		
+ | Least Squares Regression | 20% |
+ | Database Implementation: Simple Requests | 35% |		
+ | Database Implementation: Structured Queries | 25% |
+
+Functionality apart, we will evaluate your submissions carefully along the following dimensions:
++ code style;
++ clear specifications for methods;
++ implementation of unit tests;
++ comments the indicate clearly what the representation invariants and abstraction functions are for the datatypes you create.
+
+You may lose up to 40% of your score for not following some of the above non-functional requirements.
+
+### Hints
+
+- Use example code we have provided to implement a multi-threaded server.
+- You can use a parser generator (such as ANTLR) for parsing queries (or roll your own). But it is worth learning how to use a parser generator.
+- There are several easier tasks you can accomplish before focusing on structured queries. **Use your time wisely.**
+- When you complete this assignment, you would have implemented an approximation of a relational database. In the relational database world, a row is analogous to an instance of a datatype while a table definition is analogous to a datatype definition.
