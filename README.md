@@ -148,12 +148,12 @@ We will grade your work using the following _approximate_ breakdown of the aspec
 
 We will use the following approximate rubric to grade your work:		
 
- | Task | Grade Contribution |		
- |:----|---:|		
- | k-means Clustering | 20% |		
- | Least Squares Regression | 20% |
- | Database Implementation: Simple Requests | 35% |		
- | Database Implementation: Structured Queries | 25% |
+| Task | Grade Contribution |		
+|:----|---:|		
+| k-means Clustering | 20% |		
+| Least Squares Regression | 20% |
+| Database Implementation: Simple Requests | 35% |		
+| Database Implementation: Structured Queries | 25% |
 
 Functionality apart, we will evaluate your submissions carefully along the following dimensions:
 + code style;
