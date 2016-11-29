@@ -5,15 +5,14 @@ import ca.ece.ubc.cpen221.mp5.RestaurantDB;
 public interface LeastSquaresRegression {
 
 	/**
-	 * Compute a predicted rating given user and restaurant information
+	 * Compute a predicted rating given restaurant information for a particular
+	 * user. The user information is used a priori to construct the function.
 	 *
 	 * @param db
 	 *            the database for the yelp dataset
-	 * @param user_id
-	 *            the user for whom we are making predictions
 	 * @param restaurant_id
 	 *            the restaurant for which we would like a predicted rating
 	 * @return the predicted rating
 	 */
-	public double lsrf(RestaurantDB db, String user_id, String restaurant_id);
+	public double lsrf(RestaurantDB db, String restaurant_id);
 }
