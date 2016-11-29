@@ -24,12 +24,12 @@ public class Algorithms {
 	}
 
 	// here we are abusing notation a bit when passing a function to getPredictor. This is a way to pass a function that obtains, say, latitude or longitude of a restaurant. You can improve on this is you like. It is the implementation of getBestPredictor that matters.
-	public static LeastSquaresRegression getPredictor(User u, RestaurantDB db, LeastSquaresRegression featureFunction) {
+	public static LeastSquaresRegression getPredictor(User u, RestaurantDB db, FeatureFunction featureFunction) {
 		// TODO: Implement this method
 		return null;
 	}
 
-	public static LeastSquaresRegression getBestPredictor(User u, RestaurantDB db, List<LeastSquaresRegression> featureFunctionList) {
+	public static LeastSquaresRegression getBestPredictor(User u, RestaurantDB db, List<FeatureFunction> featureFunctionList) {
 		// TODO: Implement this method
 		return null;
 	}
