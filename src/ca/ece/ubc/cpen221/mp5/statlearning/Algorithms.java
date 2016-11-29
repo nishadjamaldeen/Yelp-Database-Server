@@ -51,7 +51,7 @@ public class Algorithms {
 	 *            is a list of feature functions from which the best is selected
 	 * @return the best prediction function
 	 */
-	public static LeastSquaresRegression getBestPredictor(User u, RestaurantDB db,
+	public static LeastSquaresRegression getBestPredictor(String user_id, RestaurantDB db,
 			List<FeatureFunction> featureFunctionList) {
 		// TODO: Implement this method
 		return null;
