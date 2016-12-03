@@ -1,6 +1,10 @@
 package ca.ece.ubc.cpen221.mp5;
 
+
 import java.util.Set;
+import org.json.
+
+import jdk.nashorn.internal.parser.JSONParser;
 
 // TODO: This class represents the Restaurant Database.
 // Define the internal representation and
@@ -25,8 +29,12 @@ public class RestaurantDB {
 	 * @param usersJSONfilename
 	 *            the filename for the users
 	 */
-	public RestaurantDB(String restaurantJSONfilename, String reviewsJSONfilename, String usersJSONfilename) {
-		// TODO: Implement this method
+	
+	
+	public RestaurantDB(String restaurantJSONfilename, String reviewsJSONfilename, String usersJSONfilename) throws FileNotFoundException {
+		JSONParser restaurants = new JSONParser(restaurantJSONfilename, null, false).parse(restaurantJSONfilename);
+		
+		JSONObject restaurantString = (JSONObject) new JSONParser().parse(restaurantJSONfilename);
 	}
 
 }
