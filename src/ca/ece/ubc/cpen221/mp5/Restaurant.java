@@ -11,6 +11,9 @@ public class Restaurant {
 	private String[] neighbourhoods;
 	private String[] categories;
 	private String[] schools;
+	private double latitude;
+	private double longitude;
+	private int clusterGroup;
 	
 	public Restaurant(String ID, RestaurantDB db){
 		this.ID = ID;
@@ -38,7 +41,16 @@ public class Restaurant {
 		}
 		this.schools = schoolStrings;
 		
+		this.latitude = this.getLatitude();
+		this.longitude = this.getLongitude();
+		
 	}
+	/**
+	 * An alternate constructor that will be used to generate cluster centroid points
+	 * @param x
+	 * @param y
+	 */
+
 	
 	public boolean isOpen(){
 		if(restaurant.get("open").equals("true"))
@@ -110,5 +122,22 @@ public class Restaurant {
 	public int getPrice(){
 		return Integer.parseInt(restaurant.get("price").toString());
 	}
+	
+	public double getX(){
+		return this.longitude;
+	}
+	
+	public double getY(){
+		return this.latitude;
+	}
+	
+	public void setCluster(int cluster){
+		this.clusterGroup = cluster;
+	}
+	
+	public int getCluster(){
+		return this.clusterGroup;
+	}
+	
 	
 }

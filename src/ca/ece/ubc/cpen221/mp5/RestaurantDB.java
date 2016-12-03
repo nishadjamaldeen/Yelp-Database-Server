@@ -8,11 +8,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -48,7 +50,14 @@ public class RestaurantDB {
 	private Map<String, JSONObject> restaurantsJSONObjects = new HashMap<String, JSONObject>();
 	private Map<String, JSONObject> reviewsJSONObjects = new HashMap<String, JSONObject>();
 	private Map<String, JSONObject> usersJSONObjects = new HashMap<String, JSONObject>();
-	
+	private Map<String, Restaurant> restaurantObjects = new HashMap<String, Restaurant>();
+	private Set<String> neighborhoods;
+	private ArrayList<String> neighborhoodStrings = new ArrayList<String>();
+	private ArrayList<Neighborhood> neighborhoodObjects = new ArrayList<Neighborhood>();
+	private static double MAX_X = Double.MIN_VALUE;
+	private static double MIN_X =  Double.MAX_VALUE;
+	private static double MAX_Y = Double.MIN_VALUE;
+	private static double MIN_Y = Double.MAX_VALUE;
 	
 	
 	
@@ -63,6 +72,7 @@ public class RestaurantDB {
 		List<String> restaurantID = new ArrayList<String>();
 		List<String> reviewIDs = new ArrayList<String>();
 		List<String> userIDs = new ArrayList<String>();
+		this.neighborhoods = new HashSet<String>();
 		
 		String[] restaurantStrings = restaurants.split("\n");
 		String[] reviewsStrings = reviews.split("\n");
@@ -72,9 +82,60 @@ public class RestaurantDB {
 		try{
 			for (int i = 0; i< restaurantStrings.length; i++){
 				JSONObject restaurant = (JSONObject) parser.parse(restaurantStrings[i]);
+				if (Double.parseDouble(restaurant.get("longitude").toString()) > this.MAX_X) 
+					this.MAX_X = Double.parseDouble(restaurant.get("longitude").toString());
+				if (Double.parseDouble(restaurant.get("longitude").toString()) < this.MIN_X) 
+					this.MIN_X = Double.parseDouble(restaurant.get("longitude").toString());
+				if (Double.parseDouble(restaurant.get("latitude").toString()) > this.MAX_Y) 
+					this.MAX_Y = Double.parseDouble(restaurant.get("latitude").toString());
+				if (Double.parseDouble(restaurant.get("latitude").toString()) < this.MIN_Y) 
+					this.MIN_Y = Double.parseDouble(restaurant.get("latitude").toString());
+				
+				
 				String ID = (String) restaurant.get("business_id");
+				
+				JSONArray neighbourhoods =  (JSONArray) restaurant.get("neighborhoods");
+				for (int j = 0; j< neighbourhoods.size(); j++){
+					this.neighborhoods.add(neighbourhoods.get(j).toString());
+				}
+				
+				
 				restaurantID.add(ID);
 				restaurantsJSONObjects.put(ID, restaurant);
+			}
+			
+			this.neighborhoodStrings.addAll(neighborhoods);
+			
+			for(int j = 0; j<neighborhoodStrings.size(); j++) 
+				this.neighborhoodObjects.add(new Neighborhood(neighborhoodStrings.get(j)));
+	
+			for (int i = 0; i<restaurantID.size(); i++){
+				restaurantObjects.put(restaurantID.get(i), new Restaurant(restaurantID.get(i), this));
+			}
+			
+			
+			
+			double xSum = 0;
+			double ySum = 0;
+			int count = 0;
+			for (int i = 0; i<neighborhoodObjects.size(); i++){
+				for (int j = 0; j<restaurantID.size(); j++){
+					JSONArray neighborhoodJSONArrayList = (JSONArray) restaurantsJSONObjects.get(restaurantID.get(j)).get("neighborhoods");
+					
+					for (int k = 0; k < neighborhoodJSONArrayList.size(); k++){
+						if(neighborhoodJSONArrayList.get(k).toString().equals(neighborhoodStrings.get(i))){
+							xSum += restaurantObjects.get(restaurantID.get(j)).getLongitude();
+							ySum += restaurantObjects.get(restaurantID.get(j)).getLatitude();
+							count++;
+						}
+					}
+				}					
+				neighborhoodObjects.get(i).setX(xSum/count);
+				neighborhoodObjects.get(i).setY(ySum/count);
+			
+				count = 0;
+				ySum = 0;
+				xSum = 0;
 			}
 			
 			for (int i = 0; i<reviewsStrings.length; i++){
@@ -96,6 +157,8 @@ public class RestaurantDB {
 		
 	}
 	
+
+	
 	private static String readCompleteFileString (String address) throws IOException {
 	    InputStream stream = new FileInputStream(address);   // open file
 
@@ -109,7 +172,7 @@ public class RestaurantDB {
 
 	        buffer.append((char) ch);
 	    }
-
+	    System.out.println("JOOOOOOOOOOOHN CEEEEENNNNNNNAAA");
 	    return buffer.toString();
 	    }
 	/**
@@ -134,7 +197,31 @@ public class RestaurantDB {
 		return usersJSONObjects;
 	}
 	
+	public Set<String> getAllNeighborhoods() {
+		return this.neighborhoods;
+	}
 	
-
-
+	public ArrayList<String> getAllNeighborhoodStrings() {
+		return this.neighborhoodStrings;
+	}
+	
+	public ArrayList<Neighborhood> getAllNeighborhoodObjects() {
+		return this.neighborhoodObjects;
+	}
+	
+	public double getMinX(){
+		return this.MIN_X;
+	}
+	
+	public double getMinY(){
+		return this.MIN_Y;
+	}
+	
+	public double getMaxX(){
+		return this.MAX_X;
+	}
+	
+	public double getMaxY(){
+		return this.MAX_Y;
+	}
 }
