@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -61,6 +64,7 @@ public class RestaurantDB {
 	private static double MAX_Y = Double.NEGATIVE_INFINITY;
 	private static double MIN_Y = Double.POSITIVE_INFINITY;
 	private ArrayList<String> restaurantIDstringList;
+	private HashMap<String, String> restaurantString = new HashMap<String, String>();
 	//private HashMap<String,HashMap<String, HashMap<String, Double>>> userPredictionValues = new HashMap<String, HashMap<String,  HashMap<String, Double>>>();
 	
 	
@@ -80,6 +84,8 @@ public class RestaurantDB {
 		String[] restaurantStrings = restaurants.split("\n");
 		String[] reviewsStrings = reviews.split("\n");
 		String[] usersStrings = users.split("\n");
+		
+		
 		
 		
 		try{
@@ -107,6 +113,7 @@ public class RestaurantDB {
 				
 				restaurantID.add(ID);
 				restaurantsJSONObjects.put(ID, restaurant);
+				this.restaurantString.put(ID, restaurantStrings[i]);
 			}
 			
 			this.restaurantIDstringList = restaurantID;
@@ -248,6 +255,10 @@ public class RestaurantDB {
 	
 	public HashMap<String, Review> getReviewObjects() {
 		return this.allReviewObjects;
+	}
+	
+	public HashMap<String, String> getRestaurantStrings(){
+		return this.restaurantString;
 	}
 	/*public double getUserAValue(String user_ID, String function){
 		return userPredictionValues.get(user_ID).get(function).get("a");

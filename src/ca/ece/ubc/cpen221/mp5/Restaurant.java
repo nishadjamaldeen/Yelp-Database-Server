@@ -13,6 +13,7 @@ public class Restaurant {
 	private String[] neighbourhoods;
 	private String[] categories;
 	private String[] schools;
+	private String restaurantString;
 	private double latitude;
 	private double longitude;
 	private int clusterGroup;
@@ -45,6 +46,8 @@ public class Restaurant {
 		
 		this.latitude = this.getLatitude();
 		this.longitude = this.getLongitude();
+		
+		this.restaurantString = db.getRestaurantStrings().get(ID);
 		
 	}
 	/**
@@ -143,6 +146,14 @@ public class Restaurant {
 	
 	public int getCluster(){
 		return this.clusterGroup;
+	}
+	
+	public JSONObject getJSONRestaurant(){
+		return this.restaurant;
+	}
+	
+	public String getRestaurantString(){
+		return this.restaurantString;
 	}
 	
 	public Double getTypeValue(String ratingType){

@@ -1,6 +1,10 @@
 package ca.ece.ubc.cpen221.mp5.statlearning;
 
 import java.util.Set;
+
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -93,8 +97,18 @@ public class Algorithms {
 	}
 
 	public static String convertClustersToJSON(List<Set<Restaurant>> clusters) {
-		// TODO: Implement this method
-		return null;
+		ArrayList<Set<Restaurant>> clusterGroup = new ArrayList<Set<Restaurant>>(clusters);
+		StringBuilder restaurantString = new StringBuilder();
+		
+		
+		for (int i = 0; i< clusterGroup.size(); i++){
+			ArrayList<Restaurant> nthCluster = new ArrayList<Restaurant>(clusterGroup.get(i));
+			for (int j = 0; j<nthCluster.size(); j++){
+				restaurantString.append(nthCluster.get(j).getRestaurantString());
+				restaurantString.append("\n");
+			}
+		}
+		return restaurantString.toString();
 	}
 
 	/**
@@ -171,14 +185,10 @@ public class Algorithms {
 		a = yMean-b*xMean;
 		r_squared = Math.pow(Sxy, 2)/(Sxx*Syy);
 		
-
-		
-		
 		aVal = a;
 		bVal = b;
 		r_squaredVal = r_squared;
 		f = featureFunction;
-		
 		
 		return new LeastSquaresRegressionImp();
 	}

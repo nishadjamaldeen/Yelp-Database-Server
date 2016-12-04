@@ -22,10 +22,7 @@ public class Main {
 		
 		Restaurant test = new Restaurant("gclB3ED6uk6viWlolSb_uA", db);
 		
-		String t = new String();
-		FeatureFunction f = new PriceFunction();
-		
-		Algorithms.getPredictor(t, db, f).lsrf(db, "g")
+		System.out.println(test.getBusinessID());
 		
 
 		
