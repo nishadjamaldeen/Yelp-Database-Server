@@ -1,5 +1,7 @@
 package ca.ece.ubc.cpen221.mp5.statlearning;
 
+import ca.ece.ubc.cpen221.mp5.RestaurantDB;
+
 public interface FeatureFunction {
 
 	/**
@@ -12,5 +14,7 @@ public interface FeatureFunction {
 	 * @return the desired feature
 	 */
 	public double getFeature(RestaurantDB rdb, String restaurant_id);
+	
+	
 
 }

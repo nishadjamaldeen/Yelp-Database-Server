@@ -50,15 +50,18 @@ public class RestaurantDB {
 	private Map<String, JSONObject> restaurantsJSONObjects = new HashMap<String, JSONObject>();
 	private Map<String, JSONObject> reviewsJSONObjects = new HashMap<String, JSONObject>();
 	private Map<String, JSONObject> usersJSONObjects = new HashMap<String, JSONObject>();
-	private Map<String, Restaurant> restaurantObjects = new HashMap<String, Restaurant>();
+	private HashMap<String, Restaurant> restaurantObjects = new HashMap<String, Restaurant>();
+	private HashMap<String, Users> allUserObjects = new HashMap<String, Users>();
+	private HashMap<String, Review> allReviewObjects = new HashMap<String, Review>();
 	private Set<String> neighborhoods;
 	private ArrayList<String> neighborhoodStrings = new ArrayList<String>();
 	private ArrayList<Neighborhood> neighborhoodObjects = new ArrayList<Neighborhood>();
-	private static double MAX_X = Double.MIN_VALUE;
-	private static double MIN_X =  Double.MAX_VALUE;
-	private static double MAX_Y = Double.MIN_VALUE;
-	private static double MIN_Y = Double.MAX_VALUE;
-	
+	private static double MAX_X = Double.NEGATIVE_INFINITY;
+	private static double MIN_X =  Double.POSITIVE_INFINITY;
+	private static double MAX_Y = Double.NEGATIVE_INFINITY;
+	private static double MIN_Y = Double.POSITIVE_INFINITY;
+	private ArrayList<String> restaurantIDstringList;
+	private HashMap<String,HashMap<String, HashMap<String, Double>>> userPredictionValues = new HashMap<String, HashMap<String,  HashMap<String, Double>>>();
 	
 	
 	public RestaurantDB(String restaurantJSONfilename, String reviewsJSONfilename, String usersJSONfilename) throws IOException, ParseException {
@@ -69,9 +72,9 @@ public class RestaurantDB {
 		String reviews = readCompleteFileString("data/" + reviewsJSONfilename);
 		String users = readCompleteFileString("data/" + usersJSONfilename);	
 		
-		List<String> restaurantID = new ArrayList<String>();
-		List<String> reviewIDs = new ArrayList<String>();
-		List<String> userIDs = new ArrayList<String>();
+		ArrayList<String> restaurantID = new ArrayList<String>();
+		ArrayList<String> reviewIDs = new ArrayList<String>();
+		ArrayList<String> userIDs = new ArrayList<String>();
 		this.neighborhoods = new HashSet<String>();
 		
 		String[] restaurantStrings = restaurants.split("\n");
@@ -84,8 +87,10 @@ public class RestaurantDB {
 				JSONObject restaurant = (JSONObject) parser.parse(restaurantStrings[i]);
 				if (Double.parseDouble(restaurant.get("longitude").toString()) > this.MAX_X) 
 					this.MAX_X = Double.parseDouble(restaurant.get("longitude").toString());
+		
 				if (Double.parseDouble(restaurant.get("longitude").toString()) < this.MIN_X) 
 					this.MIN_X = Double.parseDouble(restaurant.get("longitude").toString());
+				
 				if (Double.parseDouble(restaurant.get("latitude").toString()) > this.MAX_Y) 
 					this.MAX_Y = Double.parseDouble(restaurant.get("latitude").toString());
 				if (Double.parseDouble(restaurant.get("latitude").toString()) < this.MIN_Y) 
@@ -103,6 +108,8 @@ public class RestaurantDB {
 				restaurantID.add(ID);
 				restaurantsJSONObjects.put(ID, restaurant);
 			}
+			
+			this.restaurantIDstringList = restaurantID;
 			
 			this.neighborhoodStrings.addAll(neighborhoods);
 			
@@ -142,14 +149,16 @@ public class RestaurantDB {
 				JSONObject review = (JSONObject) parser.parse(reviewsStrings[i]);
 				String ID = (String) review.get("review_id");
 				reviewIDs.add(ID);
-				restaurantsJSONObjects.put(ID, review);
+				reviewsJSONObjects.put(ID, review);
+				this.allReviewObjects.put(ID, new Review(ID, this));
 			}
 			
 			for (int i = 0; i<usersStrings.length; i++){
 				JSONObject user = (JSONObject) parser.parse(usersStrings[i]);
 				String ID = (String) user.get("user_id");
 				userIDs.add(ID);
-				restaurantsJSONObjects.put(ID, user);
+				usersJSONObjects.put(ID, user);
+				this.allUserObjects.put(ID, new Users(ID, this));
 			}
 		} catch (ParseException e) {
 			e.printStackTrace();
@@ -223,5 +232,44 @@ public class RestaurantDB {
 	
 	public double getMaxY(){
 		return this.MAX_Y;
+	}
+	
+	public ArrayList<String> getRestaurantIDs(){
+		return this.restaurantIDstringList;
+	}
+	
+	public HashMap<String, Restaurant> getRestaurantObjects(){
+		return this.restaurantObjects;
+	}
+	
+	public HashMap<String, Users> getUsersObjects(){
+		return this.allUserObjects;
+	}
+	
+	public HashMap<String, Review> getReviewObjects() {
+		return this.allReviewObjects;
+	}
+	public double getUserAValue(String user_ID, String function){
+		return userPredictionValues.get(user_ID).get(function).get("a");
+	}
+	public double getUserBValue(String user_ID, String function){
+		return userPredictionValues.get(user_ID).get(function).get("b");
+	}
+	public double getUserRsquaredValue(String user_ID, String function){
+		return userPredictionValues.get(user_ID).get(function).get("r_squared");
+	}
+	
+	public void setUserValues(double a,double b,double r_squared, String user_ID, String function){
+		HashMap<String, Double> insideMap = new HashMap<String, Double>();
+		insideMap.put("a", a);
+		insideMap.put("b", b);
+		insideMap.put("r_squared", r_squared);
+		HashMap<String, HashMap<String,Double>> middleMap = new HashMap<String, HashMap<String,Double>>();
+		middleMap.put(function, insideMap);
+		userPredictionValues.put(user_ID, middleMap);
+	}
+	
+	public HashMap<String,HashMap<String, HashMap<String, Double>>> getPredicitions(){
+		return this.userPredictionValues;
 	}
 }

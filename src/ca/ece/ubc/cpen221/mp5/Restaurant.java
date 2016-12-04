@@ -3,6 +3,8 @@ package ca.ece.ubc.cpen221.mp5;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+
+
 public class Restaurant {
 	
 	private String ID;
@@ -131,12 +133,29 @@ public class Restaurant {
 		return this.latitude;
 	}
 	
+	public static double getDistance(Restaurant point, Neighborhood centroidPoint){
+		return Math.sqrt(Math.pow((point.getX() - centroidPoint.getX()),2) + Math.pow((point.getY() - centroidPoint.getY()),2));
+	}
+	
 	public void setCluster(int cluster){
 		this.clusterGroup = cluster;
 	}
 	
 	public int getCluster(){
 		return this.clusterGroup;
+	}
+	
+	public Double getTypeValue(String ratingType){
+		if (ratingType.equals("price"))
+			return (double) this.getPrice();
+		else if (ratingType.equals("longitude"))
+			return this.getLongitude();
+		else if (ratingType.equals("latitude"))
+			return this.getLatitude();
+		else if (ratingType.equals("stars"))
+			return this.getStars();
+		else
+			return 0.0;
 	}
 	
 	

@@ -6,14 +6,14 @@ import java.util.Random;
 
 import Exceptions.PointBoundException;
 
-public class Restaurant {
+public class Point {
 	
 	private double x;
 	private double y;
 	private int clusterGroup;
 	private String name;
 	
-	public Restaurant(double x, double y, String name){
+	public Point(double x, double y, String name){
 		this.x = x;
 		this.y = y;
 		this.name = name;

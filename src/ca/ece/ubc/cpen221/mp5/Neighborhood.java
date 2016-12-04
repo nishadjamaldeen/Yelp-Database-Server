@@ -5,14 +5,18 @@ public class Neighborhood {
 	double x;
 	double y;
 	String name;
+	RestaurantDB db;
+	int clusterNum;
 	
 	
 	public Neighborhood(String name) {
 		this.name = name;
 	}
 	
-	public Neighbourhood(double x, double y){
-		
+	public Neighborhood(double x, double y, int clusterNum){
+		this.x = x;
+		this.y = y;
+		this.clusterNum = clusterNum;
 	}
 
 	public double getX() {
@@ -33,5 +37,13 @@ public class Neighborhood {
 	
 	public String getNeighborhoodName() {
 		return this.name;
+	}
+	
+	public void setClusterNum(int clusterNum){
+		this.clusterNum = clusterNum;
+	}
+	
+	public int getClusterNum(){
+		return this.clusterNum;
 	}
 }
