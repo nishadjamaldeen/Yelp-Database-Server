@@ -1,30 +1,18 @@
 package ca.ece.ubc.cpen221.mp5;
 
-
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Stream;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-
-// TODO: This class represents the Restaurant Database.
-// Define the internal representation and
-// state the rep invariant and the abstraction function.
 
 public class RestaurantDB {
 
@@ -49,49 +37,56 @@ public class RestaurantDB {
 	 * @throws IOException 
 	 */
 	
-	
-	private Map<String, JSONObject> restaurantsJSONObjects = new HashMap<String, JSONObject>();
-	private Map<String, JSONObject> reviewsJSONObjects = new HashMap<String, JSONObject>();
-	private Map<String, JSONObject> usersJSONObjects = new HashMap<String, JSONObject>();
-	private HashMap<String, Restaurant> restaurantObjects = new HashMap<String, Restaurant>();
-	private HashMap<String, Users> allUserObjects = new HashMap<String, Users>();
-	private HashMap<String, Review> allReviewObjects = new HashMap<String, Review>();
-	private Set<String> neighborhoods;
-	private ArrayList<String> neighborhoodStrings = new ArrayList<String>();
-	private ArrayList<Neighborhood> neighborhoodObjects = new ArrayList<Neighborhood>();
-	private static double MAX_X = Double.NEGATIVE_INFINITY;
+	private Map<String, JSONObject> restaurantsJSONObjects = new HashMap<String, JSONObject>(); //key restaurantID's, value reviewJSONs 
+	private Map<String, JSONObject> reviewsJSONObjects = new HashMap<String, JSONObject>();		//key reviewID's, value reviewJSONs
+	private Map<String, JSONObject> usersJSONObjects = new HashMap<String, JSONObject>();		//key userID's, value userJSONs
+	private HashMap<String, Restaurant> restaurantObjects = new HashMap<String, Restaurant>();	//key restaurantID's, value restaurantObject
+	private HashMap<String, Users> allUserObjects = new HashMap<String, Users>();				//key userID's, value userObject
+	private HashMap<String, Review> allReviewObjects = new HashMap<String, Review>();			//key reviewID's, reviewObject
+	private Set<String> neighborhoods = new HashSet<String>();									// All names of the neighborhods in the database;
+	private ArrayList<String> neighborhoodStrings = new ArrayList<String>();					//ArrayList form of neighborhoods set
+	private ArrayList<Neighborhood> neighborhoodObjects = new ArrayList<Neighborhood>();		//Contains all neighborhoodObjects in the database.
+	private ArrayList<String> restaurantIDstringList;											//All the resturantID's 
+	private HashMap<String, String> restaurantString = new HashMap<String, String>();			//key resturantID's, value string version of all resturantJSON's.
+	private static double MAX_X = Double.NEGATIVE_INFINITY;										//Bounds for the clusters.
 	private static double MIN_X =  Double.POSITIVE_INFINITY;
 	private static double MAX_Y = Double.NEGATIVE_INFINITY;
 	private static double MIN_Y = Double.POSITIVE_INFINITY;
-	private ArrayList<String> restaurantIDstringList;
-	private HashMap<String, String> restaurantString = new HashMap<String, String>();
-	//private HashMap<String,HashMap<String, HashMap<String, Double>>> userPredictionValues = new HashMap<String, HashMap<String,  HashMap<String, Double>>>();
-	
-	
+	private ArrayList<String> requiredFieldsRestaurants = new ArrayList<String>();
+
+	/**
+	 * Constructs a Restaurant DataBase - RestaurantDB Object.
+	 * This database contains information about all resturants, users and reviews.
+	 * Business, user and review ID's can be used to access information about each individual restaurant, user and review respectively.
+	 * 
+	 * @param restaurantJSONfilename - location of the restaurant JSON file
+	 * @param reviewsJSONfilename - location of the reviews JSON file
+	 * @param usersJSONfilename	- location of the users JSON files
+	 * @throws IOException
+	 * @throws ParseException
+	 */
 	public RestaurantDB(String restaurantJSONfilename, String reviewsJSONfilename, String usersJSONfilename) throws IOException, ParseException {
 		JSONParser parser = new JSONParser();
 		
 		
-		String restaurants = readCompleteFileString("data/" + restaurantJSONfilename);
-		String reviews = readCompleteFileString("data/" + reviewsJSONfilename);
+		String restaurants = readCompleteFileString("data/" + restaurantJSONfilename);  //converts each file to a string.
+		String reviews = readCompleteFileString("data/" + reviewsJSONfilename);			//throws IOException.
 		String users = readCompleteFileString("data/" + usersJSONfilename);	
 		
-		ArrayList<String> restaurantID = new ArrayList<String>();
-		ArrayList<String> reviewIDs = new ArrayList<String>();
-		ArrayList<String> userIDs = new ArrayList<String>();
-		this.neighborhoods = new HashSet<String>();
-		
-		String[] restaurantStrings = restaurants.split("\n");
+		String[] restaurantStrings = restaurants.split("\n");							//creates String Arrays that contain each individual JSON as a String per element of the array.
 		String[] reviewsStrings = reviews.split("\n");
 		String[] usersStrings = users.split("\n");
 		
+		ArrayList<String> restaurantID = new ArrayList<String>();						//Lists of all ID's
+		ArrayList<String> reviewIDs = new ArrayList<String>();
+		ArrayList<String> userIDs = new ArrayList<String>();
 		
-		
-		
+																						//Checks for a parsing error.
 		try{
 			for (int i = 0; i< restaurantStrings.length; i++){
-				JSONObject restaurant = (JSONObject) parser.parse(restaurantStrings[i]);
-				if (Double.parseDouble(restaurant.get("longitude").toString()) > this.MAX_X) 
+				JSONObject restaurant = (JSONObject) parser.parse(restaurantStrings[i]);		//Parses each JSON string into a JSONObject for all resturants.
+				
+				if (Double.parseDouble(restaurant.get("longitude").toString()) > this.MAX_X) 	//Finds the max and min longitude and latitudes (x,y) values among all restuarants.
 					this.MAX_X = Double.parseDouble(restaurant.get("longitude").toString());
 		
 				if (Double.parseDouble(restaurant.get("longitude").toString()) < this.MIN_X) 
@@ -99,19 +94,18 @@ public class RestaurantDB {
 				
 				if (Double.parseDouble(restaurant.get("latitude").toString()) > this.MAX_Y) 
 					this.MAX_Y = Double.parseDouble(restaurant.get("latitude").toString());
+				
 				if (Double.parseDouble(restaurant.get("latitude").toString()) < this.MIN_Y) 
 					this.MIN_Y = Double.parseDouble(restaurant.get("latitude").toString());
 				
-				
 				String ID = (String) restaurant.get("business_id");
 				
-				JSONArray neighbourhoods =  (JSONArray) restaurant.get("neighborhoods");
+				JSONArray neighbourhoods =  (JSONArray) restaurant.get("neighborhoods");		//Creates a JSONArray that contains all the neighborhoods for each resturant.
 				for (int j = 0; j< neighbourhoods.size(); j++){
 					this.neighborhoods.add(neighbourhoods.get(j).toString());
 				}
 				
-				
-				restaurantID.add(ID);
+				restaurantID.add(ID);															//Adds resturant information to data structures.
 				restaurantsJSONObjects.put(ID, restaurant);
 				this.restaurantString.put(ID, restaurantStrings[i]);
 			}
@@ -120,38 +114,39 @@ public class RestaurantDB {
 			
 			this.neighborhoodStrings.addAll(neighborhoods);
 			
-			for(int j = 0; j<neighborhoodStrings.size(); j++) 
+			for(int j = 0; j<neighborhoodStrings.size(); j++) 									//Fills neighborhoodObjects with all the found neighborhoods.
 				this.neighborhoodObjects.add(new Neighborhood(neighborhoodStrings.get(j)));
 	
-			for (int i = 0; i<restaurantID.size(); i++){
+			for (int i = 0; i<restaurantID.size(); i++){										//Fills restuarantObjects with all the found resturants.
 				restaurantObjects.put(restaurantID.get(i), new Restaurant(restaurantID.get(i), this));
 			}
 			
 			
-			
-			double xSum = 0;
-			double ySum = 0;
+			double xSum = 0.0;
+			double ySum = 0.0;
 			int count = 0;
-			for (int i = 0; i<neighborhoodObjects.size(); i++){
+			
+			for (int i = 0; i<neighborhoodObjects.size(); i++){									//Finds the mean longitude and latitude (x,y) for all resturants in a particulat neighborhood.
 				for (int j = 0; j<restaurantID.size(); j++){
 					JSONArray neighborhoodJSONArrayList = (JSONArray) restaurantsJSONObjects.get(restaurantID.get(j)).get("neighborhoods");
 					
 					for (int k = 0; k < neighborhoodJSONArrayList.size(); k++){
 						if(neighborhoodJSONArrayList.get(k).toString().equals(neighborhoodStrings.get(i))){
-							xSum += restaurantObjects.get(restaurantID.get(j)).getLongitude();
-							ySum += restaurantObjects.get(restaurantID.get(j)).getLatitude();
-							count++;
+							xSum += restaurantObjects.get(restaurantID.get(j)).getLongitude();	//Sum of all the longitudes.
+							ySum += restaurantObjects.get(restaurantID.get(j)).getLatitude();	//Sum of all the latitudes.
+							count++;															//Sum of the resturants in the neighborhood(i).
 						}
 					}
 				}					
-				neighborhoodObjects.get(i).setX(xSum/count);
-				neighborhoodObjects.get(i).setY(ySum/count);
+				neighborhoodObjects.get(i).setX(xSum/count); 									//Sets the longitude of the neighborhood(i) as the mean longitude.
+				neighborhoodObjects.get(i).setY(ySum/count);									//Sets the latidue of the neighborhood(i) as the mean latitude.
 			
-				count = 0;
-				ySum = 0;
-				xSum = 0;
+				count = 0;																		//Reset to 0 for next neighborhood.
+				ySum = 0.0;
+				xSum = 0.0;
 			}
 			
+																								//Finds and adds any and all review information to the data base.
 			for (int i = 0; i<reviewsStrings.length; i++){
 				JSONObject review = (JSONObject) parser.parse(reviewsStrings[i]);
 				String ID = (String) review.get("review_id");
@@ -160,6 +155,7 @@ public class RestaurantDB {
 				this.allReviewObjects.put(ID, new Review(ID, this));
 			}
 			
+																								//Finds and adds any and all user information to the data base.
 			for (int i = 0; i<usersStrings.length; i++){
 				JSONObject user = (JSONObject) parser.parse(usersStrings[i]);
 				String ID = (String) user.get("user_id");
@@ -167,18 +163,45 @@ public class RestaurantDB {
 				usersJSONObjects.put(ID, user);
 				this.allUserObjects.put(ID, new Users(ID, this));
 			}
-		} catch (ParseException e) {
+			
+		} catch (ParseException e) {															//JSON must be formatted correctly.
 			e.printStackTrace();
 		}
+		
+		
+		this.requiredFieldsRestaurants.add("open");
+		this.requiredFieldsRestaurants.add("url");
+		this.requiredFieldsRestaurants.add("longitude");
+		this.requiredFieldsRestaurants.add("neighborhoods");
+		this.requiredFieldsRestaurants.add("name");
+		this.requiredFieldsRestaurants.add("categories");
+		this.requiredFieldsRestaurants.add("state");
+		this.requiredFieldsRestaurants.add("type");
+		this.requiredFieldsRestaurants.add("stars");
+		this.requiredFieldsRestaurants.add("city");
+		this.requiredFieldsRestaurants.add("full_address");
+		this.requiredFieldsRestaurants.add("review_count");
+		this.requiredFieldsRestaurants.add("photo_url");
+		this.requiredFieldsRestaurants.add("schools");
+		this.requiredFieldsRestaurants.add("latitude");
+		this.requiredFieldsRestaurants.add("price");
+		
+		
+		
+		
 		
 	}
 	
 
-	
+	/**
+	 * Converts a given file into its string representation.
+	 * @param address- location of the file to be read.
+	 * @return
+	 * @throws IOException
+	 */
 	private static String readCompleteFileString (String address) throws IOException {
-	    InputStream stream = new FileInputStream(address);   // open file
-
-	    // read each letter into a buffer
+	    InputStream stream = new FileInputStream(address);   									// opens file
+	    																						// reads each letter into a buffer
 	    StringBuffer buffer = new StringBuffer();
 	    while (true) {
 	        int ch = stream.read();
@@ -188,99 +211,157 @@ public class RestaurantDB {
 
 	        buffer.append((char) ch);
 	    }
-	    System.out.println("JOOOOOOOOOOOHN CEEEEENNNNNNNAAA");
+	    
 	    return buffer.toString();
-	    }
+	}
+	
 	/**
-	 * 
-	 * @return Map of restaurant data in JSON format
+	 * keys - business ID's
+	 * @return Map with values of all restaurant data in JSON format from the database.
 	 */
 	public Map<String, JSONObject> getRestaurants(){
 		return restaurantsJSONObjects;
 	}
 	/**
-	 * 
-	 * @return Map of review data in JSON format
+	 * keys - review ID's
+	 * @return Map with values of all review data in JSON format from the database.
 	 */
 	public Map<String, JSONObject> getReview(){
 		return reviewsJSONObjects;
 	}
 	/**
-	 * 
-	 * @return Map of user data in JSON format
+	 * keys - user ID's
+	 * @return Map with values of all user data in JSON format from the database.
 	 */
 	public Map<String, JSONObject> getUsers(){
 		return usersJSONObjects;
 	}
-	
+	/**
+	 * 
+	 * @return all neighborhood's names from the database.
+	 */
 	public Set<String> getAllNeighborhoods() {
 		return this.neighborhoods;
 	}
-	
+	/**
+	 * 
+	 * @return all neighborhood's names from the database.
+	 */
 	public ArrayList<String> getAllNeighborhoodStrings() {
 		return this.neighborhoodStrings;
 	}
-	
+	/**
+	 * 
+	 * @return all neighborhood objects from the database.
+	 */
 	public ArrayList<Neighborhood> getAllNeighborhoodObjects() {
 		return this.neighborhoodObjects;
 	}
-	
+	/**
+	 * 
+	 * @return the minimum longitide(x) of a resturant in the database.
+	 */
 	public double getMinX(){
 		return this.MIN_X;
 	}
-	
+	/**
+	 * 
+	 * @return the minimum latitude(y) of a resturant in the database.
+	 */
 	public double getMinY(){
 		return this.MIN_Y;
 	}
-	
+	/**
+	 * 
+	 * @return the maximum longitude(x) of a restaurant in the database.
+	 */
 	public double getMaxX(){
 		return this.MAX_X;
 	}
-	
+	/**
+	 * 
+	 * @return the maximum latitude(y) of a restaurant in the database.
+	 */
 	public double getMaxY(){
 		return this.MAX_Y;
 	}
-	
+	/**
+	 * 
+	 * @return all the resturantID's in the databse.
+	 */
 	public ArrayList<String> getRestaurantIDs(){
 		return this.restaurantIDstringList;
 	}
-	
+	/**
+	 * 
+	 * @return all the resturant objects in the database.
+	 */
 	public HashMap<String, Restaurant> getRestaurantObjects(){
 		return this.restaurantObjects;
 	}
-	
+	/**
+	 * key - User ID's
+	 * @return Map with values as all the user objects in the database.
+	 */
 	public HashMap<String, Users> getUsersObjects(){
 		return this.allUserObjects;
 	}
-	
+	/**
+	 * key - review ID's
+	 * @return Map with values as all the review objects in the database.
+	 */
 	public HashMap<String, Review> getReviewObjects() {
 		return this.allReviewObjects;
 	}
-	
+	/**
+	 * key - business ID's
+	 * @return Map with values as all the resturant objects in the database.
+	 */
 	public HashMap<String, String> getRestaurantStrings(){
 		return this.restaurantString;
 	}
-	/*public double getUserAValue(String user_ID, String function){
-		return userPredictionValues.get(user_ID).get(function).get("a");
-	}
-	public double getUserBValue(String user_ID, String function){
-		return userPredictionValues.get(user_ID).get(function).get("b");
-	}
-	public double getUserRsquaredValue(String user_ID, String function){
-		return userPredictionValues.get(user_ID).get(function).get("r_squared");
+	
+	public ArrayList<String> getRequiredRestaurantFields() {
+		return this.requiredFieldsRestaurants;
 	}
 	
-	public void setUserValues(double a,double b,double r_squared, String user_ID, String function){
-		HashMap<String, Double> insideMap = new HashMap<String, Double>();
-		insideMap.put("a", a);
-		insideMap.put("b", b);
-		insideMap.put("r_squared", r_squared);
-		HashMap<String, HashMap<String,Double>> middleMap = new HashMap<String, HashMap<String,Double>>();
-		middleMap.put(function, insideMap);
-		userPredictionValues.put(user_ID, middleMap);
+	/**
+	 * Add's a resturant to the database.
+	 * r should be in JSON format else a error message is printed.
+	 * @param r 
+	 * @throws ParseException 
+	 */
+	public String addRestaurant(String r) throws ParseException, NullPointerException, IllegalArgumentException{
+		JSONParser parser = new JSONParser();
+		
+		
+																			//Check to see if r is in JSON format
+		try{
+			JSONObject restaurant = (JSONObject) parser.parse(r);
+		} catch (ParseException e) {
+			System.out.println("ERR: INVALID_RESTAURANT_STRING ");
+		}
+		
+		
+		
+		JSONObject restaurant = (JSONObject) parser.parse(r);
+		
+		
+																			//Check to see if missing fields.
+		try{
+			for(int i = 0; i < this.getRequiredRestaurantFields().size(); i++) {
+				restaurant.get(this.getRequiredRestaurantFields().get(i));
+			}
+		} catch(NullPointerException e) {
+			System.out.println("ERR: INVALID_RESTAURANT_STRING");
+		}
+		
+		
+		
+		
+		
+		String sucessMessage = "";
+		return sucessMessage;
 	}
 	
-	public HashMap<String,HashMap<String, HashMap<String, Double>>> getPredicitions(){
-		return this.userPredictionValues;
-	}*/
 }
