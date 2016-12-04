@@ -25,7 +25,8 @@ public class Main {
 		String t = new String();
 		FeatureFunction f = new PriceFunction();
 		
-		Algorithms.getPredictor(t, db, f).lsrf(db, restaurant_id)
+		Algorithms.getPredictor(t, db, f).lsrf(db, "g")
+		
 
 		
 		

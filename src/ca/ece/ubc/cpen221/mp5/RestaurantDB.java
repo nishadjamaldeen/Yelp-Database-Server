@@ -61,7 +61,7 @@ public class RestaurantDB {
 	private static double MAX_Y = Double.NEGATIVE_INFINITY;
 	private static double MIN_Y = Double.POSITIVE_INFINITY;
 	private ArrayList<String> restaurantIDstringList;
-	private HashMap<String,HashMap<String, HashMap<String, Double>>> userPredictionValues = new HashMap<String, HashMap<String,  HashMap<String, Double>>>();
+	//private HashMap<String,HashMap<String, HashMap<String, Double>>> userPredictionValues = new HashMap<String, HashMap<String,  HashMap<String, Double>>>();
 	
 	
 	public RestaurantDB(String restaurantJSONfilename, String reviewsJSONfilename, String usersJSONfilename) throws IOException, ParseException {
@@ -249,7 +249,7 @@ public class RestaurantDB {
 	public HashMap<String, Review> getReviewObjects() {
 		return this.allReviewObjects;
 	}
-	public double getUserAValue(String user_ID, String function){
+	/*public double getUserAValue(String user_ID, String function){
 		return userPredictionValues.get(user_ID).get(function).get("a");
 	}
 	public double getUserBValue(String user_ID, String function){
@@ -271,5 +271,5 @@ public class RestaurantDB {
 	
 	public HashMap<String,HashMap<String, HashMap<String, Double>>> getPredicitions(){
 		return this.userPredictionValues;
-	}
+	}*/
 }

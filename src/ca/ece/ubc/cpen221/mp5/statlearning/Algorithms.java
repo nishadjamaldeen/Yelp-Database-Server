@@ -172,17 +172,6 @@ public class Algorithms {
 		r_squared = Math.pow(Sxy, 2)/(Sxx*Syy);
 		
 
-		/*
-		 * 
-		 * we dont need a b r in top.
-		 * 
-		 * add them to the data base here.
-		 * 
-		 * find them in lsr implementation
-		 * 
-		 * 
-		 * 
-		 */
 		
 		
 		aVal = a;
@@ -191,8 +180,7 @@ public class Algorithms {
 		f = featureFunction;
 		
 		
-		
-		return null;
+		return new LeastSquaresRegressionImp();
 	}
 
 	/**
@@ -208,7 +196,42 @@ public class Algorithms {
 	 */
 	public static LeastSquaresRegression getBestPredictor(String user_id, RestaurantDB db,
 			List<FeatureFunction> featureFunctionList) {
-		// TODO: Implement this method
-		return null;
+		
+		ArrayList<FeatureFunction> featureFunctionArray = new ArrayList<FeatureFunction>(featureFunctionList);
+		ArrayList<Double> rSquaredValueList = new ArrayList<Double>();
+		
+		for (int i = 0; i< featureFunctionArray.size(); i++){
+			Algorithms.getPredictor(user_id, db, featureFunctionArray.get(i));
+			rSquaredValueList.add(Algorithms.getRsqauredVal());
+		}
+		
+		double bestRValue = 0;
+		
+		for (int i = 0; i< rSquaredValueList.size(); i++){
+			if(Math.abs(rSquaredValueList.get(i) - 1) < Math.abs(bestRValue - 1))
+				bestRValue = rSquaredValueList.get(i);
+		}
+		
+		int indexOfBestRVal = rSquaredValueList.indexOf(bestRValue);
+		
+		Algorithms.getPredictor(user_id, db, featureFunctionArray.get(indexOfBestRVal));
+		
+		return new LeastSquaresRegressionImp();
+	}
+	
+	public static double getAVal(){
+		return aVal;
+	}
+	
+	public static double getBVal(){
+		return bVal;
+	}
+	
+	public static double getRsqauredVal(){
+		return r_squaredVal;
+	}
+	
+	public static FeatureFunction getFeatureFunction(){
+		return f;
 	}
 }
