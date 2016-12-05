@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -23,6 +24,13 @@ public class Main {
 		Restaurant test = new Restaurant("gclB3ED6uk6viWlolSb_uA", db);
 		
 		System.out.println(test.getBusinessID());
+		
+		Scanner s = new Scanner(System.in);
+		
+		String t = s.nextLine();
+		
+		System.out.println(db.addRestaurant(t));
+		
 		
 
 		

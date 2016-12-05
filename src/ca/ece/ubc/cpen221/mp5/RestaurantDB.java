@@ -38,21 +38,27 @@ public class RestaurantDB {
 	 */
 	
 	private Map<String, JSONObject> restaurantsJSONObjects = new HashMap<String, JSONObject>(); //key restaurantID's, value reviewJSONs 
-	private Map<String, JSONObject> reviewsJSONObjects = new HashMap<String, JSONObject>();		//key reviewID's, value reviewJSONs
-	private Map<String, JSONObject> usersJSONObjects = new HashMap<String, JSONObject>();		//key userID's, value userJSONs
 	private HashMap<String, Restaurant> restaurantObjects = new HashMap<String, Restaurant>();	//key restaurantID's, value restaurantObject
-	private HashMap<String, Users> allUserObjects = new HashMap<String, Users>();				//key userID's, value userObject
+	private ArrayList<String> restaurantIDstringList;											//All the resturantID's 
+	private HashMap<String, String> restaurantString = new HashMap<String, String>();			//key resturantID's, value string version of all resturantJSON's.
+	private ArrayList<String> requiredFieldsRestaurants = new ArrayList<String>();
+	
+	private Map<String, JSONObject> reviewsJSONObjects = new HashMap<String, JSONObject>();		//key reviewID's, value reviewJSONs
 	private HashMap<String, Review> allReviewObjects = new HashMap<String, Review>();			//key reviewID's, reviewObject
+	
+	private Map<String, JSONObject> usersJSONObjects = new HashMap<String, JSONObject>();		//key userID's, value userJSONs
+	private HashMap<String, Users> allUserObjects = new HashMap<String, Users>();				//key userID's, value userObject
+	
 	private Set<String> neighborhoods = new HashSet<String>();									// All names of the neighborhods in the database;
 	private ArrayList<String> neighborhoodStrings = new ArrayList<String>();					//ArrayList form of neighborhoods set
 	private ArrayList<Neighborhood> neighborhoodObjects = new ArrayList<Neighborhood>();		//Contains all neighborhoodObjects in the database.
-	private ArrayList<String> restaurantIDstringList;											//All the resturantID's 
-	private HashMap<String, String> restaurantString = new HashMap<String, String>();			//key resturantID's, value string version of all resturantJSON's.
+	
+	
 	private static double MAX_X = Double.NEGATIVE_INFINITY;										//Bounds for the clusters.
 	private static double MIN_X =  Double.POSITIVE_INFINITY;
 	private static double MAX_Y = Double.NEGATIVE_INFINITY;
 	private static double MIN_Y = Double.POSITIVE_INFINITY;
-	private ArrayList<String> requiredFieldsRestaurants = new ArrayList<String>();
+	
 
 	/**
 	 * Constructs a Restaurant DataBase - RestaurantDB Object.
@@ -331,37 +337,57 @@ public class RestaurantDB {
 	 * @param r 
 	 * @throws ParseException 
 	 */
-	public String addRestaurant(String r) throws ParseException, NullPointerException, IllegalArgumentException{
+	public String addRestaurant(String r) throws ParseException{
 		JSONParser parser = new JSONParser();
-		
-		
-																			//Check to see if r is in JSON format
+																	//Check to see if r is in JSON format
 		try{
 			JSONObject restaurant = (JSONObject) parser.parse(r);
 		} catch (ParseException e) {
-			System.out.println("ERR: INVALID_RESTAURANT_STRING ");
+			return "ERR: INVALID_RESTAURANT_STRING";
 		}
-		
 		
 		
 		JSONObject restaurant = (JSONObject) parser.parse(r);
+																		//Check to see if missing fields.
+		
+		for(int i = 0; i < this.getRequiredRestaurantFields().size(); i++) {
+				if(restaurant.get(this.getRequiredRestaurantFields().get(i)) == null )
+					return "ERR: INVALID_RESTAURANT_STRING";
+			} 
+		
+		ArrayList<String> IDs = this.getRestaurantIDs();
+		HashMap<String, Restaurant> allRestaurants = this.getRestaurantObjects();
+		double x =  Double.parseDouble(restaurant.get("longitude").toString());
+		double y = Double.parseDouble(restaurant.get("latitude").toString());
+		double xi = 0.0;
+		double yi = 0.0;
 		
 		
-																			//Check to see if missing fields.
-		try{
-			for(int i = 0; i < this.getRequiredRestaurantFields().size(); i++) {
-				restaurant.get(this.getRequiredRestaurantFields().get(i));
-			}
-		} catch(NullPointerException e) {
-			System.out.println("ERR: INVALID_RESTAURANT_STRING");
+		for(int i = 0; i < allRestaurants.size(); i++) {
+			xi = allRestaurants.get(IDs.get(i)).getLongitude();
+			yi = allRestaurants.get(IDs.get(i)).getLatitude();
+			
+			if(xi == x && yi == y)
+				return "ERR: DUPLICATE_RESTAURANT";
 		}
+		this.restaurantIDstringList.add("ADD RANDOM ID HERE");
 		
+		this.restaurantString.put("ADD RANDOM ID HERE", r);
 		
+		this.restaurantsJSONObjects.put("ADD RANDOM ID HERE", restaurant);
+		Restaurant res = new Restaurant("ADD RANDOM ID HERE", this);
+		this.restaurantObjects.put("ADD RANDOM ID HERE", res);
 		
+		StringBuilder addFields = new StringBuilder();
 		
+		addFields.append(r);
+		addFields.deleteCharAt(addFields.length()-1);
+		addFields.append(", \"stars\": 0.0, ");
+		addFields.append("\"business_id\": ");
+		addFields.append("\"ADD RANDOM ID HERE\"");
+		addFields.append("}");
 		
-		String sucessMessage = "";
-		return sucessMessage;
+		return addFields.toString();
 	}
 	
 }
