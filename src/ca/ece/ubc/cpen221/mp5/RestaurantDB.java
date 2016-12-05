@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -39,15 +40,17 @@ public class RestaurantDB {
 	
 	private Map<String, JSONObject> restaurantsJSONObjects = new HashMap<String, JSONObject>(); //key restaurantID's, value reviewJSONs 
 	private HashMap<String, Restaurant> restaurantObjects = new HashMap<String, Restaurant>();	//key restaurantID's, value restaurantObject
-	private ArrayList<String> restaurantIDstringList;											//All the resturantID's 
+	private ArrayList<String> restaurantIDstringList;											//All the resturantID's
 	private HashMap<String, String> restaurantString = new HashMap<String, String>();			//key resturantID's, value string version of all resturantJSON's.
 	private ArrayList<String> requiredFieldsRestaurants = new ArrayList<String>();
 	
 	private Map<String, JSONObject> reviewsJSONObjects = new HashMap<String, JSONObject>();		//key reviewID's, value reviewJSONs
 	private HashMap<String, Review> allReviewObjects = new HashMap<String, Review>();			//key reviewID's, reviewObject
+	private ArrayList<String> reviewIDstringList = new ArrayList<String>();
 	
 	private Map<String, JSONObject> usersJSONObjects = new HashMap<String, JSONObject>();		//key userID's, value userJSONs
 	private HashMap<String, Users> allUserObjects = new HashMap<String, Users>();				//key userID's, value userObject
+	private ArrayList<String> userIDstringList = new ArrayList<String>();
 	
 	private Set<String> neighborhoods = new HashSet<String>();									// All names of the neighborhods in the database;
 	private ArrayList<String> neighborhoodStrings = new ArrayList<String>();					//ArrayList form of neighborhoods set
@@ -74,10 +77,15 @@ public class RestaurantDB {
 	public RestaurantDB(String restaurantJSONfilename, String reviewsJSONfilename, String usersJSONfilename) throws IOException, ParseException {
 		JSONParser parser = new JSONParser();
 		
+		String restaurantJSONDirectoryFilename = restaurantJSONfilename.substring(2);
+		String reviewsJSONDirectoryFilename = reviewsJSONfilename.substring(2);
+		String usersJSONDirectoryFilename = usersJSONfilename.substring(2);
 		
-		String restaurants = readCompleteFileString("data/" + restaurantJSONfilename);  //converts each file to a string.
-		String reviews = readCompleteFileString("data/" + reviewsJSONfilename);			//throws IOException.
-		String users = readCompleteFileString("data/" + usersJSONfilename);	
+		
+		
+		String restaurants = readCompleteFileString(restaurantJSONDirectoryFilename);  //converts each file to a string.
+		String reviews = readCompleteFileString(reviewsJSONDirectoryFilename);			//throws IOException.
+		String users = readCompleteFileString(usersJSONDirectoryFilename);	
 		
 		String[] restaurantStrings = restaurants.split("\n");							//creates String Arrays that contain each individual JSON as a String per element of the array.
 		String[] reviewsStrings = reviews.split("\n");
@@ -161,6 +169,8 @@ public class RestaurantDB {
 				this.allReviewObjects.put(ID, new Review(ID, this));
 			}
 			
+			this.reviewIDstringList = reviewIDs;
+			
 																								//Finds and adds any and all user information to the data base.
 			for (int i = 0; i<usersStrings.length; i++){
 				JSONObject user = (JSONObject) parser.parse(usersStrings[i]);
@@ -170,6 +180,8 @@ public class RestaurantDB {
 				this.allUserObjects.put(ID, new Users(ID, this));
 			}
 			
+			this.userIDstringList = userIDs;
+		
 		} catch (ParseException e) {															//JSON must be formatted correctly.
 			e.printStackTrace();
 		}
@@ -220,6 +232,62 @@ public class RestaurantDB {
 	    
 	    return buffer.toString();
 	}
+	
+	public String randomIDGeneratorRestaurants(){
+		String IDLetterSequence = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz1234567890";
+		Random randChar = new Random();
+		StringBuilder restaurantIDinterim = new StringBuilder();
+		
+		for (int i = 0; i< 23; i++){
+			restaurantIDinterim.append(IDLetterSequence.charAt(randChar.nextInt(63)+1));
+		}
+		
+		for (int i = 0; i <this.restaurantIDstringList.size(); i++){
+			if (this.restaurantIDstringList.get(i).equals(restaurantIDinterim.toString()))
+				randomIDGeneratorRestaurants();
+		}
+		
+		return this.restaurantIDstringList.toString();
+		
+	}
+	
+	public String randomIDGeneratorUsers(){
+		String IDLetterSequence = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz1234567890";
+		Random randChar = new Random();
+		StringBuilder restaurantIDinterim = new StringBuilder();
+		
+		for (int i = 0; i< 23; i++){
+			restaurantIDinterim.append(IDLetterSequence.charAt(randChar.nextInt(63)+1));
+		}
+		
+		for (int i = 0; i <this.userIDstringList.size(); i++){
+			if (this.restaurantIDstringList.get(i).equals(restaurantIDinterim.toString()))
+				randomIDGeneratorUsers();
+		}
+		
+		return this.restaurantIDstringList.toString();
+		
+	}
+	
+	public String randomIDGeneratorReviews(){
+		String IDLetterSequence = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz1234567890";
+		Random randChar = new Random();
+		StringBuilder restaurantIDinterim = new StringBuilder();
+		
+		for (int i = 0; i< 23; i++){
+			restaurantIDinterim.append(IDLetterSequence.charAt(randChar.nextInt(63)+1));
+		}
+		
+		for (int i = 0; i <this.reviewIDstringList.size(); i++){
+			if (this.restaurantIDstringList.get(i).equals(restaurantIDinterim.toString()))
+				randomIDGeneratorReviews();
+		}
+		
+		return this.restaurantIDstringList.toString();
+		
+	}
+	
+	
 	
 	/**
 	 * keys - business ID's

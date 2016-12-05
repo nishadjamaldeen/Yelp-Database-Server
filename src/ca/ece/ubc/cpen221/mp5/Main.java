@@ -19,17 +19,20 @@ public class Main {
 	
 	public static void main (String[] args) throws IOException, ParseException {
 		System.out.println("1");
-		RestaurantDB db = new RestaurantDB("restaurants.json", "reviews.json", "users.json");
+		RestaurantDB db = new RestaurantDB("./data/restaurants.json", "./data/reviews.json", "./data/users.json");
 		
 		Restaurant test = new Restaurant("gclB3ED6uk6viWlolSb_uA", db);
 		
-		System.out.println(test.getBusinessID());
+		/*System.out.println(test.getBusinessID());
 		
 		Scanner s = new Scanner(System.in);
 		
 		String t = s.nextLine();
 		
-		System.out.println(db.addRestaurant(t));
+		System.out.println(db.addRestaurant(t));*/
+		
+		System.out.println("JOOOOOOOOOOOOOOOOOOOOOOOOOOHHHHHHN CEEEEEEEEEEENAAAAA");
+		System.out.println(db.getMaxX());
 		
 		
 

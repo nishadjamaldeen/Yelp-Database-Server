@@ -3,6 +3,8 @@ package ca.ece.ubc.cpen221.mp5.statlearning;
 import java.util.ArrayList;
 import java.util.List;
 
+import ca.ece.ubc.cpen221.mp5.Restaurant;
+
 public class Cluster {
 	
 	private int clusterNum;

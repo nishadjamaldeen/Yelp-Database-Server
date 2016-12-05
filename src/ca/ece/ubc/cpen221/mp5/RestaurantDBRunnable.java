@@ -29,6 +29,22 @@ public class RestaurantDBRunnable implements Runnable {
 			PrintWriter output = new PrintWriter(clientSocket.getOutputStream(), true);
 			restaurantDB = new RestaurantDB(this.restaurantJSONfile, this.reviewsJSONfile, this.userJSONfile);
 			
+			while(clientSocket.isConnected()){
+				String request = input.readLine();
+				String characteristic;
+				
+				if (request.startsWith("RANDOMREVIEW"))
+					characteristic = request.substring(request.indexOf('<')+1, request.lastIndexOf('>'));
+				else if (request.startsWith("GETRESTAURANT"))
+					characteristic = request.substring(request.indexOf('<')+1, request.lastIndexOf('>'));
+				else if (request.startsWith("ADDUSER"))
+					characteristic = request.substring(request.indexOf('<')+1, request.lastIndexOf('>'));
+				else if (request.startsWith("ADDRESTAURANT"))
+					characteristic = request.substring(request.indexOf('<')+1, request.lastIndexOf('>'));
+				else if (request.startsWith("ADDREVIEW"))
+					characteristic = request.substring(request.indexOf('<')+1, request.lastIndexOf('>'));	
+			}
+			
 			
 		} catch (IOException e) {
 			e.printStackTrace();
