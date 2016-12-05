@@ -32,7 +32,7 @@ public class Main {
 		
 		
 		
-		System.out.println(db.getRandomReview(a));
+		System.out.println(db.getRestaurant(a));
 		
 		
 		

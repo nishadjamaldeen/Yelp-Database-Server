@@ -39,7 +39,7 @@ public class RestaurantDB {
 	 * @throws IOException 
 	 */
 	
-	private Map<String, JSONObject> restaurantsJSONObjects = new HashMap<String, JSONObject>(); //key restaurantID's, value reviewJSONs 
+	private Map<String, JSONObject> restaurantsJSONObjects = new HashMap<String, JSONObject>(); //key restaurantID's, value restaurantJSONs 
 	private HashMap<String, Restaurant> restaurantObjects = new HashMap<String, Restaurant>();	//key restaurantID's, value restaurantObject
 	private ArrayList<String> restaurantIDstringList;											//All the resturantID's
 	private HashMap<String, String> restaurantString = new HashMap<String, String>();			//key resturantID's, value string version of all resturantJSON's.
@@ -719,6 +719,11 @@ public class RestaurantDB {
 		return getRestaurantReviews(ID).get(indexOfReview).getTextReview();
 	}
 	
+	/**
+	 * Returns all the reviews that correspond to the given business_ID
+	 * @param ID
+	 * @return empty if no reviews for the business.
+	 */
 	private ArrayList<Review> getRestaurantReviews(String ID) {
 		ArrayList<Review> theReviews = new ArrayList<Review>();
 		
@@ -727,5 +732,24 @@ public class RestaurantDB {
 				theReviews.add(this.allReviewObjects.get(this.reviewIDstringList.get(i)));
 		}
 		return theReviews;
+	}
+	
+	/**
+	 * 
+	 * @param ID
+	 * @return The Corresponding Restaurant in JSON Format, or error if no restaurant exists in the database. 
+	 */
+	public String getRestaurant(String ID) {
+		boolean notInDataBase = true;
+		
+		for(int i = 0; i < this.restaurantIDstringList.size(); i++){
+			if(this.restaurantIDstringList.get(i).equals(ID))
+					notInDataBase = false;
+		}
+		
+		if(notInDataBase)
+			return "ERR: NO_RESTAURANT_FOUND";
+		
+		return this.restaurantString.get(ID);
 	}
 }
