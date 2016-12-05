@@ -47,10 +47,16 @@ public class RestaurantDB {
 	private Map<String, JSONObject> reviewsJSONObjects = new HashMap<String, JSONObject>();		//key reviewID's, value reviewJSONs
 	private HashMap<String, Review> allReviewObjects = new HashMap<String, Review>();			//key reviewID's, reviewObject
 	private ArrayList<String> reviewIDstringList = new ArrayList<String>();
+	private ArrayList<String> requiredFieldsReviews = new ArrayList<String>();
+	private HashMap<String, String> reviewString = new HashMap<String, String>();
+	private ArrayList<String> requiredVotesReviews = new ArrayList<String>();
+	
 	
 	private Map<String, JSONObject> usersJSONObjects = new HashMap<String, JSONObject>();		//key userID's, value userJSONs
 	private HashMap<String, Users> allUserObjects = new HashMap<String, Users>();				//key userID's, value userObject
 	private ArrayList<String> userIDstringList = new ArrayList<String>();
+	private ArrayList<String> requiredFieldsUsers = new ArrayList<String>();
+	private HashMap<String, String> userString = new HashMap<String, String>();
 	
 	private Set<String> neighborhoods = new HashSet<String>();									// All names of the neighborhods in the database;
 	private ArrayList<String> neighborhoodStrings = new ArrayList<String>();					//ArrayList form of neighborhoods set
@@ -167,6 +173,7 @@ public class RestaurantDB {
 				reviewIDs.add(ID);
 				reviewsJSONObjects.put(ID, review);
 				this.allReviewObjects.put(ID, new Review(ID, this));
+				this.reviewString.put(ID, reviewsStrings[i]);
 			}
 			
 			this.reviewIDstringList = reviewIDs;
@@ -174,10 +181,11 @@ public class RestaurantDB {
 																								//Finds and adds any and all user information to the data base.
 			for (int i = 0; i<usersStrings.length; i++){
 				JSONObject user = (JSONObject) parser.parse(usersStrings[i]);
-				String ID = (String) user.get("user_id");
+				String ID = user.get("user_id").toString();
 				userIDs.add(ID);
 				usersJSONObjects.put(ID, user);
 				this.allUserObjects.put(ID, new Users(ID, this));
+				this.userString.put(ID, usersStrings[i]);
 			}
 			
 			this.userIDstringList = userIDs;
@@ -195,7 +203,6 @@ public class RestaurantDB {
 		this.requiredFieldsRestaurants.add("categories");
 		this.requiredFieldsRestaurants.add("state");
 		this.requiredFieldsRestaurants.add("type");
-		this.requiredFieldsRestaurants.add("stars");
 		this.requiredFieldsRestaurants.add("city");
 		this.requiredFieldsRestaurants.add("full_address");
 		this.requiredFieldsRestaurants.add("review_count");
@@ -204,10 +211,19 @@ public class RestaurantDB {
 		this.requiredFieldsRestaurants.add("latitude");
 		this.requiredFieldsRestaurants.add("price");
 		
+		this.requiredFieldsUsers.add("name");
 		
+		this.requiredFieldsReviews.add("type");
+		this.requiredFieldsReviews.add("business_id");
+		this.requiredFieldsReviews.add("votes");
+		this.requiredFieldsReviews.add("text");
+		this.requiredFieldsReviews.add("stars");
+		this.requiredFieldsReviews.add("user_id");
+		this.requiredFieldsReviews.add("date");
 		
-		
-		
+		this.requiredVotesReviews.add("cool");
+		this.requiredVotesReviews.add("useful");
+		this.requiredVotesReviews.add("funny");
 	}
 	
 
@@ -233,61 +249,82 @@ public class RestaurantDB {
 	    return buffer.toString();
 	}
 	
-	public String randomIDGeneratorRestaurants(){
-		String IDLetterSequence = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz1234567890";
-		Random randChar = new Random();
-		StringBuilder restaurantIDinterim = new StringBuilder();
+	
+	/**
+	 * 
+	 * @return a new business ID not in the database.
+	 */
+	private String randomIDGeneratorRestaurants() {
 		
-		for (int i = 0; i< 23; i++){
-			restaurantIDinterim.append(IDLetterSequence.charAt(randChar.nextInt(63)+1));
+		Random r = new Random();
+		int Low = 10000000;
+		int High = 99999999;
+		int Result = r.nextInt(High-Low) + Low;
+		
+		for(int i = 0; i < this.restaurantIDstringList.size(); i++){
+			if(String.valueOf(Result).equals(restaurantIDstringList.get(i))){
+				i = 0;
+				Result = new Random().nextInt(High-Low) + Low;
+			}	
 		}
 		
-		for (int i = 0; i <this.restaurantIDstringList.size(); i++){
-			if (this.restaurantIDstringList.get(i).equals(restaurantIDinterim.toString()))
-				randomIDGeneratorRestaurants();
-		}
-		
-		return this.restaurantIDstringList.toString();
-		
+		return String.valueOf(Result);
 	}
 	
-	public String randomIDGeneratorUsers(){
-		String IDLetterSequence = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz1234567890";
-		Random randChar = new Random();
-		StringBuilder restaurantIDinterim = new StringBuilder();
+	/**
+	 * 
+	 * @return a new user ID not in the database.
+	 */
+	private String randomIDGeneratorUsers(){
 		
-		for (int i = 0; i< 23; i++){
-			restaurantIDinterim.append(IDLetterSequence.charAt(randChar.nextInt(63)+1));
+		Random r = new Random();
+		int Low = 10000000;
+		int High = 99999999;
+		int Result = r.nextInt(High-Low) + Low;
+		
+		for(int i = 0; i < this.userIDstringList.size(); i++){
+			if(String.valueOf(Result).equals(userIDstringList.get(i))){
+				i = 0;
+				Result = new Random().nextInt(High-Low) + Low;
+			}	
 		}
 		
-		for (int i = 0; i <this.userIDstringList.size(); i++){
-			if (this.restaurantIDstringList.get(i).equals(restaurantIDinterim.toString()))
-				randomIDGeneratorUsers();
-		}
-		
-		return this.restaurantIDstringList.toString();
+		return String.valueOf(Result);
 		
 	}
-	
-	public String randomIDGeneratorReviews(){
-		String IDLetterSequence = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz1234567890";
-		Random randChar = new Random();
-		StringBuilder restaurantIDinterim = new StringBuilder();
+	/**
+	 * 
+	 * @return a new review ID not in the database.
+	 */
+	private String randomIDGeneratorReviews(){
 		
-		for (int i = 0; i< 23; i++){
-			restaurantIDinterim.append(IDLetterSequence.charAt(randChar.nextInt(63)+1));
+		Random r = new Random();
+		int Low = 10000000;
+		int High = 999999999;
+		int Result = r.nextInt(High-Low) + Low;
+		
+		for(int i = 0; i < this.reviewIDstringList.size(); i++){
+			if(String.valueOf(Result).equals(reviewIDstringList.get(i))){
+				i = 0;
+				Result = new Random().nextInt(High-Low) + Low;
+			}	
 		}
 		
-		for (int i = 0; i <this.reviewIDstringList.size(); i++){
-			if (this.restaurantIDstringList.get(i).equals(restaurantIDinterim.toString()))
-				randomIDGeneratorReviews();
-		}
-		
-		return this.restaurantIDstringList.toString();
-		
+		return String.valueOf(Result);
 	}
 	
-	
+	private String generateRandomURL(String id) {
+		
+		String url;
+		StringBuilder urlBuild = new StringBuilder();
+		
+		urlBuild.append("http://www.yelp.com/user_details?userid=");
+		urlBuild.append(id);
+		
+		url = urlBuild.toString();
+		
+		return url;
+	}
 	
 	/**
 	 * keys - business ID's
@@ -438,13 +475,11 @@ public class RestaurantDB {
 			if(xi == x && yi == y)
 				return "ERR: DUPLICATE_RESTAURANT";
 		}
-		this.restaurantIDstringList.add("ADD RANDOM ID HERE");
 		
-		this.restaurantString.put("ADD RANDOM ID HERE", r);
 		
-		this.restaurantsJSONObjects.put("ADD RANDOM ID HERE", restaurant);
-		Restaurant res = new Restaurant("ADD RANDOM ID HERE", this);
-		this.restaurantObjects.put("ADD RANDOM ID HERE", res);
+		
+		
+		String newID = this.randomIDGeneratorRestaurants();
 		
 		StringBuilder addFields = new StringBuilder();
 		
@@ -452,10 +487,182 @@ public class RestaurantDB {
 		addFields.deleteCharAt(addFields.length()-1);
 		addFields.append(", \"stars\": 0.0, ");
 		addFields.append("\"business_id\": ");
-		addFields.append("\"ADD RANDOM ID HERE\"");
+		addFields.append("\"");
+		addFields.append(newID);
+		addFields.append("\"");
 		addFields.append("}");
+		
+		String newR = addFields.toString();
+		JSONObject newRestaurant = (JSONObject) parser.parse(newR);
+		
+		
+		
+		this.restaurantIDstringList.add(newID);
+		
+		this.restaurantString.put(newID, newR);
+		
+		this.restaurantsJSONObjects.put(newID, newRestaurant);
+		Restaurant res = new Restaurant(newID, this);
+		this.restaurantObjects.put(newID, res);
+		
+		
+		
 		
 		return addFields.toString();
 	}
 	
+	/**
+	 * Adds a new User to the data base. A name must be given in JSON format.
+	 * @param u
+	 * @return
+	 * @throws ParseException
+	 */
+	public String addUser(String u) throws ParseException {
+		
+		JSONParser parser = new JSONParser();
+																				//Check to see if r is in JSON format
+		try{
+			JSONObject restaurant = (JSONObject) parser.parse(u);
+		} catch (ParseException e) {
+			return "ERR: INVALID_USER_STRING";
+		}
+
+
+		JSONObject user = (JSONObject) parser.parse(u);
+																				//Check to see if missing fields.
+
+		for(int i = 0; i < this.getRequiredUserFields().size(); i++) {
+			if(user.get(this.getRequiredUserFields().get(i)) == null )
+				return "ERR: INVALID_USER_STRING";
+			}
+		
+		
+		String newID = this.randomIDGeneratorUsers();
+		String newURL = this.generateRandomURL(newID);
+		
+		String newUserString = this.fillNewUser(u, newID, newURL);
+		JSONObject newUser = (JSONObject) parser.parse(newUserString);
+		
+		this.userIDstringList.add(newID);
+		
+		this.userString.put(newID, newUserString);
+		
+		this.usersJSONObjects.put(newID, newUser);
+		Users us = new Users(newID, this);
+		this.allUserObjects.put(newID, us);
+		
+		return newUserString;
+
+	}
+	
+	/**
+	 * Adds a review to the database.
+	 * @param r must be in JSON Format.
+	 * @return
+	 * @throws ParseException
+	 */
+	public String addReview(String r) throws ParseException {
+		
+		JSONParser parser = new JSONParser();
+																						//Check to see if r is in JSON format
+		try{
+			JSONObject review = (JSONObject) parser.parse(r);
+		} catch (ParseException e) {
+			return "ERR: INVALID_REVIEW_STRING";
+		}
+
+
+		JSONObject review = (JSONObject) parser.parse(r);
+																						//Check to see if missing fields.
+
+		for(int i = 0; i < this.requiredFieldsReviews.size(); i++) {
+			if(review.get(this.requiredFieldsReviews.get(i)) == null )
+				return "ERR: INVALID_REVIEW_STRING";
+		} 
+		
+		JSONObject votes = (JSONObject) review.get("votes");
+		
+		for(int i = 0; i < this.requiredVotesReviews.size(); i++) {
+			if( votes.get(this.requiredVotesReviews.get(i)) == null )
+				return "ERR: INVALID_REVIEW_STRING";
+		} 
+		
+		boolean isArestaurant = false;
+		
+		for(int i = 0; i < this.restaurantIDstringList.size(); i++) {
+			if(review.get("business_id").toString().equals(this.restaurantIDstringList.get(i)))
+				isArestaurant = true;
+		}
+		
+		if(!isArestaurant)
+			return "ERR: NO_SUCH_RESTAURANT";
+		
+		boolean isAUser = false;
+		
+		for(int i = 0; i < this.userIDstringList.size(); i++) {
+			if(review.get("user_id").toString().equals(this.userIDstringList.get(i)))
+				isAUser = true;
+		}
+		
+		if(!isAUser)
+			return "ERR: NO_SUCH_USER";
+		
+		
+		String ID = this.randomIDGeneratorReviews();
+		
+		StringBuilder addFields = new StringBuilder();
+		
+		addFields.append(r);
+		addFields.deleteCharAt(addFields.length()-1);
+		addFields.append(", \"review_id\": ");
+		addFields.append("\"");
+		addFields.append(ID);
+		addFields.append("\"");
+		addFields.append("}");
+		
+		String newR = addFields.toString();
+		JSONObject newReview = (JSONObject) parser.parse(newR);
+		
+		
+		this.reviewIDstringList.add(ID);
+		
+		this.reviewString.put(ID, newR);
+		
+		this.reviewsJSONObjects.put(ID, newReview);
+		Review rev = new Review(ID, this);
+		this.allReviewObjects.put(ID, rev);
+		
+		return newR;
+	}
+	
+
+	/**
+	 * 
+	 * @return the required fields in a JSON to create a new user in the database.
+	 */
+	private ArrayList<String> getRequiredUserFields() {
+		return this.requiredFieldsUsers;
+	}
+	
+	
+	private String fillNewUser(String u, String id, String url) {
+		String end;
+		
+		StringBuilder addToU = new StringBuilder();
+		
+		addToU.append(u);
+		addToU.deleteCharAt(addToU.length()-1);
+		addToU.append(", \"user_id\": ");
+		addToU.append("\"");
+		addToU.append(id);
+		addToU.append("\"");
+		addToU.append(", \"url\": ");
+		addToU.append("\"");
+		addToU.append(url);
+		addToU.append("\"");
+		addToU.append(", \"votes\": {\"funny\": 0, \"useful\": 0, \"cool\": 0}, \"review_count\": 0, \"type\": \"user\", \"average_stars\": 0}");
+		
+		end = addToU.toString();
+		return end;
+	}
 }

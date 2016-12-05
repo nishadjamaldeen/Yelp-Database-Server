@@ -23,16 +23,16 @@ public class Main {
 		
 		Restaurant test = new Restaurant("gclB3ED6uk6viWlolSb_uA", db);
 		
-		/*System.out.println(test.getBusinessID());
+		System.out.println(test.getBusinessID());
 		
 		Scanner s = new Scanner(System.in);
 		
-		String t = s.nextLine();
 		
-		System.out.println(db.addRestaurant(t));*/
+		String a = s.nextLine();
 		
-		System.out.println("JOOOOOOOOOOOOOOOOOOOOOOOOOOHHHHHHN CEEEEEEEEEEENAAAAA");
-		System.out.println(db.getMaxX());
+		
+		System.out.println(db.addReview(a));
+		
 		
 		
 
