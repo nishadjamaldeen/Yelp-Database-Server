@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketException;
 
 import org.json.simple.parser.ParseException;
 
@@ -29,20 +30,33 @@ public class RestaurantDBRunnable implements Runnable {
 			PrintWriter output = new PrintWriter(clientSocket.getOutputStream(), true);
 			restaurantDB = new RestaurantDB(this.restaurantJSONfile, this.reviewsJSONfile, this.userJSONfile);
 			
-			while(clientSocket.isConnected()){
+			while (clientSocket.isConnected()){
 				String request = input.readLine();
 				String characteristic;
 				
-				if (request.startsWith("RANDOMREVIEW"))
-					characteristic = request.substring(request.indexOf('<')+1, request.lastIndexOf('>'));
-				else if (request.startsWith("GETRESTAURANT"))
-					characteristic = request.substring(request.indexOf('<')+1, request.lastIndexOf('>'));
-				else if (request.startsWith("ADDUSER"))
-					characteristic = request.substring(request.indexOf('<')+1, request.lastIndexOf('>'));
-				else if (request.startsWith("ADDRESTAURANT"))
-					characteristic = request.substring(request.indexOf('<')+1, request.lastIndexOf('>'));
-				else if (request.startsWith("ADDREVIEW"))
-					characteristic = request.substring(request.indexOf('<')+1, request.lastIndexOf('>'));	
+				System.out.println(request);
+				
+				if (request.startsWith("RANDOMREVIEW")){
+					characteristic = request.substring(13);
+					output.println(this.restaurantDB.getRandomReview(characteristic));
+				}
+				else if (request.startsWith("GETRESTAURANT")){
+					characteristic = request.substring(14);
+					System.out.println(this.restaurantDB.getRestaurant(characteristic));
+					output.println(this.restaurantDB.getRestaurant(characteristic));
+				}
+				else if (request.startsWith("ADDUSER")){
+					characteristic = request.substring(8);
+					output.println(this.restaurantDB.addUser(characteristic));
+				}
+				else if (request.startsWith("ADDRESTAURANT")){
+					characteristic = request.substring(14);
+					output.println(this.restaurantDB.addRestaurant(characteristic));
+				}
+				else if (request.startsWith("ADDREVIEW")){
+					characteristic = request.substring(10);
+					output.println(this.restaurantDB.addReview(characteristic));
+				}
 			}
 			
 			
