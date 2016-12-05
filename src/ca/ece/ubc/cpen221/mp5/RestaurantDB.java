@@ -3,6 +3,7 @@ package ca.ece.ubc.cpen221.mp5;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -61,6 +62,8 @@ public class RestaurantDB {
 	private Set<String> neighborhoods = new HashSet<String>();									// All names of the neighborhods in the database;
 	private ArrayList<String> neighborhoodStrings = new ArrayList<String>();					//ArrayList form of neighborhoods set
 	private ArrayList<Neighborhood> neighborhoodObjects = new ArrayList<Neighborhood>();		//Contains all neighborhoodObjects in the database.
+	
+	
 	
 	
 	private static double MAX_X = Double.NEGATIVE_INFINITY;										//Bounds for the clusters.
@@ -664,5 +667,65 @@ public class RestaurantDB {
 		
 		end = addToU.toString();
 		return end;
+	}
+	
+	/**
+	 * Finds a random review for a resturant. If more than one restraunt with the same name sends an error message.
+	 * @param name - JSON Format
+	 * @return
+	 * @throws ParseException
+	 */
+	public String getRandomReview(String name) throws ParseException{
+		
+		JSONParser parser = new JSONParser();
+																						//Check to see if r is in JSON format
+		try{
+			JSONObject jsonName = (JSONObject) parser.parse(name);
+		} catch (ParseException e) {
+			return "ERR: NOT_JSON";
+		}
+
+
+		JSONObject jsonName = (JSONObject) parser.parse(name);
+		
+		int numInDB = 0;
+		int indexOfID = 0;
+		
+		for(int i = 0; i < this.restaurantObjects.size(); i++) {
+			if(this.restaurantObjects.get(this.restaurantIDstringList.get(i)).getName().equals(jsonName.get("name").toString())) {
+				numInDB++;
+				indexOfID = i;
+			}
+		}
+		
+		String ID = restaurantIDstringList.get(indexOfID);
+		
+		if(numInDB == 0)
+			return "ERR: NO_RESTAURANT_FOUND";
+		
+	    if(numInDB > 1)
+			return "ERR: MULTIPLE_RESTAURANTS";
+		
+		int numOfReviews = getRestaurantReviews(ID).size();
+		int indexOfReview = Integer.MAX_VALUE;
+		
+		while(indexOfReview >= numOfReviews) {
+			Random r = new Random();
+			int Low = 0;
+			int High = numOfReviews - 1;
+			indexOfReview = r.nextInt(High-Low) + Low;
+		}
+		
+		return getRestaurantReviews(ID).get(indexOfReview).getTextReview();
+	}
+	
+	private ArrayList<Review> getRestaurantReviews(String ID) {
+		ArrayList<Review> theReviews = new ArrayList<Review>();
+		
+		for(int i = 0; i < this.reviewIDstringList.size(); i++){
+			if(this.allReviewObjects.get(this.reviewIDstringList.get(i)).getBusinessID().equals(ID))
+				theReviews.add(this.allReviewObjects.get(this.reviewIDstringList.get(i)));
+		}
+		return theReviews;
 	}
 }

@@ -31,7 +31,9 @@ public class Main {
 		String a = s.nextLine();
 		
 		
-		System.out.println(db.addReview(a));
+		
+		System.out.println(db.getRandomReview(a));
+		
 		
 		
 		
