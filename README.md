@@ -170,3 +170,4 @@ You may lose up to 40% of your score for not following some of the above non-fun
 - You can use a parser generator (such as ANTLR) for parsing queries (or roll your own). But it is worth learning how to use a parser generator.
 - There are several easier tasks you can accomplish before focusing on structured queries. **Use your time wisely.**
 - When you complete this assignment, you would have implemented an approximation of a relational database. In the relational database world, a row is analogous to an instance of a datatype while a table definition is analogous to a datatype definition.
+# Yelp-Database-Server
